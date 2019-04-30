@@ -17,7 +17,7 @@ public class Node {
         this.cargo = cargo;
         // default value is fine for Node.next
     }
-    public Node( Object cargo, Node nextNode) {
+    public Node( Object cargo, Node nextNode, Node previousNode) {
         this( cargo);
         this.nextNode = nextNode;
         this.previousNode = previousNode;

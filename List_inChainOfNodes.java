@@ -4,13 +4,16 @@
 
 public class List_inChainOfNodes{
     private Node headSentinel;
+    private Node tailSentinel;
 
      
     /**
       Construct an empty list
      */
     public List_inChainOfNodes() {
-        headSentinel = new Node( null, null);
+        headSentinel = new Node( null, null, null);
+        tailSentinel = new Node( null, null, headSentinel);
+        headSentinel.setNextNode(tailSentinel);
     }
 
     /**
@@ -18,14 +21,20 @@ public class List_inChainOfNodes{
      */
     public int size() {
         // recursive approach seems more perspicuous
-        return size( headSentinel);
+        return size( headSentinel, tailSentinel);
     }
 
     // recursively-called helper
-    private int size( Node startingAt) {
+    private int size( Node startingAt, Node endingAt) {
         Node next = startingAt.getNextNode();
-        if( next == null) return 0;
-        else return 1+ size( next);
+        Node previous = endingAt.getPreviousNode();
+        if ( next == previous) {
+            return 1;
+        } else if ( next == endingAt) {
+            return 0;
+        } else { 
+            return 2 + size( next, previous);
+        }
     }
 
 
@@ -38,7 +47,7 @@ public class List_inChainOfNodes{
         String stringRep = size() + " elements [";
 
         for( Node node = headSentinel.getNextNode()
-           ; node != null
+           ; node != tailSentinel
            ; node = node.getNextNode() )
             stringRep += node.getCargo() + ",";
         return stringRep + "]";
@@ -52,7 +61,7 @@ public class List_inChainOfNodes{
      */
      public boolean addAsHead( Object val) {
         headSentinel.setNextNode(
-          new Node( val, headSentinel.getNextNode()));
+          new Node( val, headSentinel.getNextNode(), headSentinel));
         return true;
      }
 
@@ -118,8 +127,10 @@ public class List_inChainOfNodes{
         Node newNode = new Node( value);
         Node afterNew = /* the node that should follow newNode
           in the augmented list */
-          getNodeBefore( index).setNextNode( newNode);
+            getNodeBefore( index).setNextNode( newNode);
         newNode.setNextNode( afterNew);
+        afterNew.setPreviousNode(newNode);
+        newNode.setPreviousNode(getNodeBefore(index));
         return true;
     }
 
@@ -133,10 +144,12 @@ public class List_inChainOfNodes{
       @return the value that was removed from the list
      */
     public Object remove( int index) {
+        Node after;
         Node before = getNodeBefore( index);
         Node ax = before.getNextNode();
         Object saveForReturn = ax.getCargo();
-        before.setNextNode( ax.getNextNode());
+        before.setNextNode(after = ax.getNextNode());
+        after.setPreviousNode(before);
         return saveForReturn;
     }
 }
